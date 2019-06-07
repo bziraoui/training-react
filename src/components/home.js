@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { Redirect } from 'react-router-dom';
-import { connect } from 'react-redux';
-import { store } from '../index';
+import { hooksHoc } from '../hoc/hooksHoc';
+import { actions } from '../hooks/reducers';
 
 export class Home extends Component {
     constructor(props) {
@@ -16,48 +16,43 @@ export class Home extends Component {
         console.log('Component chargé');
     };
     shouldComponentUpdate = (nextProps, nextState) => {
-        return this.state.label === nextState.label;
+        return this.state.label !== nextState.label;
     };
     componentDidUpdate = () => {
         // alert('Add to my list of titles');
-        console.log(store.getState());
+        // console.log(store.getState());
     };
     handleChange = e => {
         let label = e.target.value;
         this.setState({ label });
     };
     handleClick = e => {
-        let { count, label } = this.state;
+        let { count, label, titles } = this.state;
         count = count + 1;
-        this.setState({ count });
         if (label) {
-            this.setState(state => {
-                const titles = state.titles.concat(state.label);
-
-                return {
-                    titles,
-                    label: ''
-                };
-            });
+            this.state.titles.push(label);
         }
-        this.props.dispatchElement(label);
+        this.setState({ count, titles: this.state.titles, label: '' });
+
+        this.props.dispatch({
+            type: actions.ADD_TITLE,
+            payload: this.state.label
+        });
+        // une autre façons d'envoyer la donner si il y a un traitement avant de dispatcher
+        //this.props.actions.addTitle(this.state.label)
+        console.log(this.props.state);
     };
     render() {
-        let list;
-        if (store.getState()) {
-            console.log(store.getState());
-            list = store.getState().map(title => <li key={title}>{title}</li>);
+        if (this.state.count === 3) {
+            return (
+                <Redirect
+                    to={{
+                        pathname: '/stateless',
+                        state: { mytext: 'clique' }
+                    }}
+                />
+            );
         }
-        // if (this.state.count === 3) {
-        //     return (
-        //         <Redirect
-        //             to={{
-        //                 pathname: '/stateless',
-        //                 state: { mytext: 'clique' }
-        //             }}
-        //         />
-        //     );
-        // }
         return (
             <Fragment>
                 <h1>Ajouter un titre</h1>
@@ -71,26 +66,14 @@ export class Home extends Component {
                 <button onClick={this.handleClick}>Ajouter</button>
                 <br />
                 <h2>Mes titles </h2>
-                <ul>{list}</ul>
+                <ul>
+                    {this.props.state.titles.map(title => (
+                        <li key={title}>{title}</li>
+                    ))}
+                </ul>
             </Fragment>
         );
     }
 }
 
-const mapDispatchToProps = dispatch => ({
-    dispatchElement: state => {
-        const action = { type: 'ADD_ELEM', value: state };
-        dispatch(action);
-    }
-});
-
-const mapStateToProps = state => {
-    return { state };
-};
-
-const HomeRedux = connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(Home);
-
-export default HomeRedux;
+export default hooksHoc(Home);

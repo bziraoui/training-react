@@ -3,15 +3,16 @@ export const action = {
     value: ''
 };
 
-const initialState = { list: [] };
+const initialState = { list: ['test'] };
 
 const listReducer = (state = initialState, action) => {
     switch (action.type) {
         case 'ADD_ELEM':
-            let newState = state;
+            let newState = { state };
             newState.list.push(action.value);
-            console.log(newState);
             return newState;
+        default:
+            return state;
     }
 };
 

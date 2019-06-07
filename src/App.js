@@ -2,7 +2,7 @@ import React from 'react';
 import './App.css';
 import { BrowserRouter as Router, Link, Route, Switch } from 'react-router-dom';
 
-import HomeRedux, { Home } from './components/home';
+import Home from './components/home';
 import { Stateless } from './components/stateless';
 
 function App() {
@@ -18,7 +18,7 @@ function App() {
                     </li>
                 </ul>
                 <Switch>
-                    <Route path="/" exact component={HomeRedux} />
+                    <Route path="/" exact component={Home} />
                     <Route path="/stateless" component={Stateless} />
                 </Switch>
             </nav>
